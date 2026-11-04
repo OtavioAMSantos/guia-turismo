@@ -15,6 +15,12 @@ class _LugaresScreenState extends State<LugaresScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Lugares para visitar"),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, 'mapa'),
+            icon: Icon(Icons.map),
+          ),
+        ],
       ),
       body: Consumer<LugaresController>(
         builder: (context, lugaresController, child) {
@@ -34,7 +40,6 @@ class _LugaresScreenState extends State<LugaresScreen> {
             itemBuilder: (context, index) {
               final lugar = lugaresController.lugares[index];
               return Card(
-                color: Colors.blueGrey,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)
                 ),
@@ -42,7 +47,7 @@ class _LugaresScreenState extends State<LugaresScreen> {
                 child: ListTile(
                   onTap: (){},
                   title: Text(lugar.nome),
-                  subtitle: Text(lugar.categoria.toString()),
+                  subtitle: Text(lugar.categoria ?? 'Sem categoria'),
                   leading: CircleAvatar(child: Icon(Icons.place)),
                   trailing: IconButton(onPressed: (){}, icon: Icon(Icons.favorite),
                   ),

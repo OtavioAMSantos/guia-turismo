@@ -6,6 +6,8 @@ import 'package:guia/controllers/categorias_controller.dart';
 import 'package:guia/controllers/lugares_controller.dart';
 import 'package:guia/controllers/theme_controller.dart';
 import 'package:guia/models/lugares_model.dart';
+import 'package:guia/screens/selecionar_local_screen.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 class CadastroLugar extends StatefulWidget {
@@ -33,6 +35,19 @@ class _CadastroLugarState extends State<CadastroLugar> {
       categoriaId = null;
     });
     context.read<CameraController>().limparImagem();
+  }
+
+  // abre o mapa e preenche latitude e longitude com o ponto escolhido
+  Future<void> escolherNoMapa() async {
+    final ponto = await Navigator.push<LatLng>(
+      context,
+      MaterialPageRoute(builder: (context) => SelecionarLocalScreen()),
+    );
+    // ponto fica null se voltar sem escolher
+    if (ponto != null) {
+      latitudeController.text = ponto.latitude.toStringAsFixed(6);
+      longitudeController.text = ponto.longitude.toStringAsFixed(6);
+    }
   }
 
   Future<void> salvar(LugaresController lugaresController) async {
@@ -119,6 +134,11 @@ class _CadastroLugarState extends State<CadastroLugar> {
               keyboardType:
                   TextInputType.numberWithOptions(decimal: true, signed: true),
               decoration: InputDecoration(labelText: "Longitude"),
+            ),
+            TextButton.icon(
+              onPressed: escolherNoMapa,
+              icon: Icon(Icons.map),
+              label: Text("Buscar endereço / CEP no mapa"),
             ),
             SizedBox(height: 16),
             // dropdown com as categorias que vieram da API

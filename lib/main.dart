@@ -7,6 +7,7 @@ import 'package:guia/controllers/theme_controller.dart';
 import 'package:guia/screens/cadastro_lugar.dart';
 import 'package:guia/screens/login_screen.dart';
 import 'package:guia/screens/lugares_screen.dart';
+import 'package:guia/screens/mapa_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -36,8 +37,17 @@ class _InicializarState extends State<Inicializar> {
       child: Consumer<ThemeController>(
         builder: (context, themeController, child) => MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: ThemeData.light(),
-          darkTheme: ThemeData.dark(),
+          title: 'Guia de Turismo',
+          // as cores do app saem todas da cor teal
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.teal,
+              brightness: Brightness.dark,
+            ),
+          ),
           themeMode: themeController.temaAtual,
           // o app abre na tela de login
           initialRoute: 'login',
@@ -45,6 +55,7 @@ class _InicializarState extends State<Inicializar> {
             'login': (context) => LoginScreen(),
             'lugares': (context) => LugaresScreen(),
             'cadastro': (context) => CadastroLugar(),
+            'mapa': (context) => MapaScreen(),
           },
         ),
       ),

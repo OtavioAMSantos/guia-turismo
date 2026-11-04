@@ -26,6 +26,9 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Icon(Icons.explore, size: 64),
+                Text("Guia de Turismo", style: TextStyle(fontSize: 24)),
+                SizedBox(height: 20),
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(labelText: "E-mail"),
@@ -47,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         senhaController.text,
                       );
                       // depois de um await, confere se a tela ainda existe
-                      if (!mounted) return;
+                      if (!context.mounted) return;
                       if (ok) {
                         // pushReplacement troca a tela, assim o botão voltar
                         // não leva de novo pro login
