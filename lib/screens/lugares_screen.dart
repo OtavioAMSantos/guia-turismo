@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:guia/controllers/auth_controller.dart';
+import 'package:guia/controllers/favoritos_controller.dart';
+import 'package:guia/controllers/localizacao_controller.dart';
 import 'package:guia/controllers/lugares_controller.dart';
+import 'package:guia/widgets/lugar_detalhes.dart';
 import 'package:provider/provider.dart';
 
 class LugaresScreen extends StatefulWidget {
@@ -11,6 +15,21 @@ class LugaresScreen extends StatefulWidget {
 
 class _LugaresScreenState extends State<LugaresScreen> {
   @override
+  void initState() {
+    super.initState();
+    // pega a localização pra mostrar a distância de cada lugar
+    context.read<LocalizacaoController>().buscarPosicao();
+  }
+
+  // sai da conta e volta pra tela de login. o mounted confere se a tela ainda
+  // existe depois do await
+  Future<void> sair() async {
+    await context.read<AuthController>().deslogarUsuario();
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, 'login');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -20,6 +39,7 @@ class _LugaresScreenState extends State<LugaresScreen> {
             onPressed: () => Navigator.pushNamed(context, 'mapa'),
             icon: Icon(Icons.map),
           ),
+          IconButton(onPressed: sair, icon: Icon(Icons.logout)),
         ],
       ),
       body: Consumer<LugaresController>(
@@ -45,11 +65,30 @@ class _LugaresScreenState extends State<LugaresScreen> {
                 ),
                 elevation: 4,
                 child: ListTile(
-                  onTap: (){},
+                  onTap: () => mostrarDetalhesLugar(context, lugar),
                   title: Text(lugar.nome),
-                  subtitle: Text(lugar.categoria ?? 'Sem categoria'),
+                  // a distância aparece quando o GPS responde
+                  subtitle: Consumer<LocalizacaoController>(
+                    builder: (context, localizacao, child) {
+                      final distancia = localizacao.distanciaAte(
+                          lugar.latitude, lugar.longitude);
+                      return Text(
+                        '${lugar.categoria ?? 'Sem categoria'} $distancia',
+                      );
+                    },
+                  ),
                   leading: CircleAvatar(child: Icon(Icons.place)),
-                  trailing: IconButton(onPressed: (){}, icon: Icon(Icons.favorite),
+                  // coração cheio = favorito
+                  trailing: Consumer<FavoritosController>(
+                    builder: (context, favoritos, child) => IconButton(
+                      onPressed: () => favoritos.alternar(lugar.id),
+                      icon: Icon(
+                        favoritos.ehFavorito(lugar.id)
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: Colors.red,
+                      ),
+                    ),
                   ),
                 ),
               );

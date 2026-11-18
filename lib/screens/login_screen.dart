@@ -63,6 +63,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text("Entrar"),
                   ),
+                SizedBox(height: 12),
+                // login com a conta Google (Firebase)
+                if (!authController.carregando)
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      bool ok = await authController.entrarComGoogle();
+                      if (!context.mounted) return;
+                      if (ok) {
+                        Navigator.pushReplacementNamed(context, 'lugares');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(authController.erro)),
+                        );
+                      }
+                    },
+                    icon: Icon(Icons.login),
+                    label: Text("Entrar com o Google"),
+                  ),
               ],
             ),
           );
