@@ -25,5 +25,21 @@ class AuthService {
     } catch(e) {
       rethrow;
     }
-  } 
+  }
+
+  // cria uma conta na API (POST /usuarios, rota pública).
+  // devolve true se criou
+  Future<bool> cadastrar(String nome, String email, String senha) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/usuarios'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({"nome": nome, "email": email, "senha": senha}),
+      );
+      debugPrint('[CONTA] ${response.statusCode} ${response.body}');
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

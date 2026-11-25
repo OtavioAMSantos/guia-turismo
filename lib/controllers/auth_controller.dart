@@ -39,6 +39,31 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+  // liga a conta Google com uma conta da API: tenta logar com o e-mail do
+  // Google; se ainda não existe conta, cria e loga. a senha é montada com o
+  // uid do Firebase (id único da conta Google), então é sempre a mesma pra
+  // essa pessoa e ela não precisa digitar nada
+  Future<void> pegarTokenDaApi(User usuario) async {
+    final email = usuario.email ?? '';
+    final senha = 'google-${usuario.uid}';
+    final nome = usuario.displayName ?? email;
+    try {
+      Map dados = await AuthService().autenticar(email, senha);
+      if (dados['token'] == null) {
+        await AuthService().cadastrar(nome, email, senha);
+        dados = await AuthService().autenticar(email, senha);
+      }
+      if (dados['token'] != null) {
+        await SessionService().salvarToken(dados['token']);
+        await SessionService().salvarUsuario(dados['usuario']);
+      }
+    } catch (e) {
+      // se falhar, o login com Google continua valendo; só o cadastro de
+      // lugar fica sem token
+      debugPrint('Erro ao pegar token da API: $e');
+    }
+  }
+
   // devolve true se o login com o Google deu certo
   Future<bool> entrarComGoogle() async {
     carregando = true;
@@ -47,7 +72,11 @@ class AuthController extends ChangeNotifier {
     try {
       usuarioGoogle = await GoogleAuthService().entrarComGoogle();
       // se a pessoa cancelar a escolha da conta, o usuário volta null
-      return usuarioGoogle != null;
+      if (usuarioGoogle == null) return false;
+      // a API não aceita o token do Google, então pega um token da API
+      // pra esse mesmo e-mail (assim dá pra cadastrar lugar)
+      await pegarTokenDaApi(usuarioGoogle!);
+      return true;
     } catch (e) {
       // o erro técnico vai pro console, o usuário vê só a mensagem simples
       erro = 'Erro ao entrar com o Google!';

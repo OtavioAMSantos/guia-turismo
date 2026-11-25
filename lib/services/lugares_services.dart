@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 class LugaresServices {
   String url = '$baseUrl/lugares';
   int pagina = 1;
-  int limite = 10;
+  int limite = 100;
 
   // GET /lugares (pública). pagina e limite controlam a paginação
   Future<List<LugaresModel>> buscarLugares() async {
