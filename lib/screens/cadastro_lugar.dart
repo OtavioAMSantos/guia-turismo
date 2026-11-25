@@ -73,7 +73,10 @@ class _CadastroLugarState extends State<CadastroLugar> {
         longitude: double.parse(longitudeController.text.replaceAll(',', '.')),
         categoriaId: categoriaId!,
       );
-      String mensagem = await lugaresController.cadastrarLugar(lugar);
+      // manda junto a foto escolhida (câmera ou galeria), se tiver
+      final foto = context.read<CameraController>().imagemSelecionada;
+      String mensagem =
+          await lugaresController.cadastrarLugar(lugar, foto: foto);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(mensagem)),

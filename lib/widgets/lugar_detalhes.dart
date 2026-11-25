@@ -35,9 +35,9 @@ class LugarDetalhes extends StatelessWidget {
       }
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Não foi possível abrir o mapa!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Não foi possível abrir o mapa!")));
     }
   }
 
@@ -65,34 +65,41 @@ class LugarDetalhes extends StatelessWidget {
           ),
         ],
       ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            FotoLugar(fotos: lugar.fotos),
-            SizedBox(height: 12),
-            Text(lugar.categoria ?? 'Sem categoria'),
-            Consumer<LocalizacaoController>(
-              builder: (context, localizacao, child) {
-                final distancia =
-                    localizacao.distanciaAte(lugar.latitude, lugar.longitude);
-                if (distancia == '') {
-                  return SizedBox();
-                }
-                return Text("Distância: $distancia");
-              },
-            ),
-            SizedBox(height: 8),
-            Text(lugar.descricao),
-            SizedBox(height: 12),
-            if (temLocal)
-              ElevatedButton.icon(
-                onPressed: () => comoChegar(context),
-                icon: Icon(Icons.directions),
-                label: Text("Como chegar"),
+      // o AlertDialog não aceita largura infinita (a foto usa
+      // double.infinity), então o SizedBox dá uma largura pro conteúdo
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FotoLugar(fotos: lugar.fotos),
+              SizedBox(height: 12),
+              Text(lugar.categoria ?? 'Sem categoria'),
+              Consumer<LocalizacaoController>(
+                builder: (context, localizacao, child) {
+                  final distancia = localizacao.distanciaAte(
+                    lugar.latitude,
+                    lugar.longitude,
+                  );
+                  if (distancia == '') {
+                    return SizedBox();
+                  }
+                  return Text("Distância: $distancia");
+                },
               ),
-          ],
+              SizedBox(height: 8),
+              Text(lugar.descricao),
+              SizedBox(height: 12),
+              if (temLocal)
+                ElevatedButton.icon(
+                  onPressed: () => comoChegar(context),
+                  icon: Icon(Icons.directions),
+                  label: Text("Como chegar"),
+                ),
+            ],
+          ),
         ),
       ),
       actions: [

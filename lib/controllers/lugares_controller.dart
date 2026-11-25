@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:guia/models/lugares_model.dart';
 import 'package:guia/services/lugares_services.dart';
 import 'package:guia/services/session_service.dart';
@@ -30,7 +31,7 @@ class LugaresController extends ChangeNotifier {
     }
   }
 
-  Future<String> cadastrarLugar(LugaresModel dados) async {
+  Future<String> cadastrarLugar(LugaresModel dados, {XFile? foto}) async {
     // pega o token salvo no login. se não tiver, usa texto vazio
     final token = await SessionService().pegarToken() ?? '';
     carregando = true;
@@ -38,7 +39,7 @@ class LugaresController extends ChangeNotifier {
     notifyListeners();
     try {
       final lugaresService = LugaresServices();
-      final resposta = await lugaresService.cadastrarLugar(dados, token);
+      final resposta = await lugaresService.cadastrarLugar(dados, token, foto: foto);
       // atualiza a lista pra o lugar novo aparecer
       await listarLugares();
       return resposta;
