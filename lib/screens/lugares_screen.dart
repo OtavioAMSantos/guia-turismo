@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:guia/controllers/auth_controller.dart';
 import 'package:guia/controllers/favoritos_controller.dart';
@@ -31,10 +32,23 @@ class _LugaresScreenState extends State<LugaresScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // usuário do Google (fica null quando entrou com e-mail e senha)
+    final usuarioGoogle = FirebaseAuth.instance.currentUser;
+    final foto = usuarioGoogle?.photoURL;
     return Scaffold(
       appBar: AppBar(
         title: Text("Lugares para visitar"),
         actions: [
+          // foto e nome da conta Google. se não tiver foto mostra um ícone
+          if (usuarioGoogle != null)
+            Tooltip(
+              message: usuarioGoogle.displayName ?? usuarioGoogle.email ?? '',
+              child: CircleAvatar(
+                radius: 16,
+                backgroundImage: foto != null ? NetworkImage(foto) : null,
+                child: foto == null ? Icon(Icons.person, size: 18) : null,
+              ),
+            ),
           IconButton(
             onPressed: () => Navigator.pushNamed(context, 'mapa'),
             icon: Icon(Icons.map),
